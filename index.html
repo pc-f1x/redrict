@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProxiLink מפנה</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1976D2;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1976D2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .link {
+            margin-top: 20px;
+            word-break: break-all;
+        }
+        .button {
+            display: inline-block;
+            background-color: #1976D2;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ProxiLink</h1>
+        <p>מפנה אותך לאתר המבוקש...</p>
+        <div class="loader"></div>
+        <div id="urlDisplay" class="link"></div>
+        <a id="manualLink" class="button" style="display:none;">לחץ כאן למעבר ידני</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // פונקציה לחילוץ פרמטרים מה-URL
+            function getParameterByName(name, url = window.location.href) {
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+            
+            // ניסיון להוציא את ה-URL מפרמטר ה-redirect
+            var redirectUrl = getParameterByName('redirect');
+            
+            // בדיקה אם הגענו מ-Google Play והפרמטר קיים
+            if (redirectUrl) {
+                document.getElementById('urlDisplay').textContent = 'מעביר ל: ' + redirectUrl;
+                document.getElementById('manualLink').href = redirectUrl;
+                document.getElementById('manualLink').style.display = 'inline-block';
+                
+                // ניסיון הפניה אוטומטית
+                setTimeout(function() {
+                    window.location.href = redirectUrl;
+                }, 1500);
+            } else {
+                document.getElementById('urlDisplay').textContent = 'לא נמצאה כתובת להפניה';
+                document.querySelector('.loader').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
