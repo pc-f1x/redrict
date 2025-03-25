@@ -1,0 +1,399 @@
+:root {
+    --primary: #3563E9;
+    --primary-dark: #144BD1;
+    --primary-light: #D6E4FF;
+    --secondary: #FF605C;
+    --accent: #34C759;
+    --neutral: #242731;
+    --neutral-light: #5F6165;
+    --neutral-lighter: #E0E4FD;
+    --background: #F7F9FC;
+    --white: #FFFFFF;
+    --shadow: 0 8px 24px rgba(53, 99, 233, 0.12);
+    --shadow-heavy: 0 12px 32px rgba(13, 38, 110, 0.15);
+    --gradient: linear-gradient(135deg, #3563E9, #6E3ADB);
+    --glass: rgba(255, 255, 255, 0.6);
+    --border-radius: 16px;
+    --anim-time: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Heebo', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--neutral);
+    overflow-x: hidden;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+/* עיצוב כותרת */
+.site-header {
+    background: var(--gradient);
+    padding: 1rem 0;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.header-content {
+    padding: 3rem 0;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.site-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #FFFFFF, #D6E4FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.site-header p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+}
+
+.header-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.3;
+    overflow: hidden;
+}
+
+.header-shape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.shape-1 {
+    width: 150px;
+    height: 150px;
+    top: -50px;
+    right: 10%;
+    transform: rotate(20deg);
+}
+
+.shape-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -100px;
+    right: 20%;
+    transform: rotate(40deg);
+}
+
+.shape-3 {
+    width: 100px;
+    height: 100px;
+    bottom: 30px;
+    left: 10%;
+    transform: rotate(60deg);
+}
+
+/* עיצוב כרטיסיות */
+.card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: transform var(--anim-time), box-shadow var(--anim-time);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.card-pattern {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: var(--primary-light);
+    opacity: 0.1;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-left: 1rem;
+}
+
+.card h2, .card h3 {
+    font-weight: 600;
+    margin: 0;
+    color: var(--neutral);
+    flex: 1;
+}
+
+.card p {
+    color: var(--neutral-light);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* טפסים */
+.login-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.login-icon {
+    margin: 0 auto 2rem;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--neutral);
+    text-align: right;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--neutral-lighter);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--neutral);
+    background-color: var(--white);
+    transition: all var(--anim-time);
+}
+
+.form-input:hover, .form-select:hover {
+    border-color: var(--primary-light);
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(53, 99, 233, 0.15);
+}
+
+/* העלאת קבצים */
+.file-input-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border: 3px dashed var(--neutral-lighter);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: all var(--anim-time);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.file-input-wrapper:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.file-input-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.file-input-text {
+    color: var(--neutral);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.file-input-subtext {
+    color: var(--neutral-light);
+    font-size: 0.9rem;
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* וידאו והתקדמות */
+.video-container {
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin: 1.5rem auto;
+    box-shadow: var(--shadow);
+    background: var(--neutral-lighter);
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius);
+}
+
+.progress-container {
+    margin: 1.5rem 0;
+    display: none;
+}
+
+.progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--neutral-lighter);
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    background: var(--gradient);
+    border-radius: 4px;
+    transition: width 0.3s linear;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    color: var(--neutral-light);
+    font-size: 0.9rem;
+}
+
+/* פוטר */
+.site-footer {
+    background: var(--neutral);
+    color: var(--white);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.site-footer p {
+    opacity: 0.8;
+}
+
+/* מידע מערכת */
+.device-info {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--neutral-lighter);
+}
+
+.device-info h3 {
+    margin-bottom: 1rem;
+    color: var(--neutral);
+    font-size: 1.2rem;
+}
+
+.device-info-content {
+    background: var(--background);
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    color: var(--neutral-light);
+    font-size: 0.9rem;
+    max-height: 150px;
+    overflow-y: auto;
+}
