@@ -1,229 +1,461 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="rtl" lang="he">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מקלט אותות אולטרה-סוניים</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        button { background: #2196F3; color: white; border: none; padding: 15px 25px; 
-                font-size: 18px; border-radius: 25px; margin: 20px; }
-        #status { margin: 20px; padding: 10px; font-size: 16px; border-radius: 10px; 
-                background: #f5f5f5; }
-        .active { background: #f44336; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Vision Pro - זיהוי אובייקטים חכם</title>
+    <meta name="description" content="מערכת זיהוי אובייקטים חכמה המזהה אנשים, חיות ורכבים מתוך סרטונים באמצעות בינה מלאכותית">
+    <meta name="theme-color" content="#3563E9">
+    
+    <!-- אופטימיזציה לטעינת סגנונות -->
+    <link rel="preload" href="css/main.css" as="style">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 900px)">
+    
+    <!-- גופנים -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- אייקונים -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/app-icon-192.png">
 </head>
 <body>
-    <h1>מקלט אותות אולטרה-סוניים</h1>
-    <p>לחץ על הכפתור כדי להתחיל להאזין לאותות URL מהמכשיר השני:</p>
-    <button id="startListening">התחל האזנה</button>
-    <div id="status">סטטוס: מוכן להאזנה</div>
-
+    <header class="site-header">
+        <div class="header-shapes">
+            <div class="header-shape shape-1"></div>
+            <div class="header-shape shape-2"></div>
+            <div class="header-shape shape-3"></div>
+        </div>
+        <div class="container">
+            <div class="header-content">
+                <h1>AI Vision Pro</h1>
+                <p>מערכת זיהוי אובייקטים חכמה המזהה אנשים, חיות, רכבים ועוד ברמת דיוק גבוהה ובאיכות תמונה משופרת</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- הודעות מערכת -->
+        <div id="notification" class="notification">
+            <div class="notification-icon info">
+                <i class="fas fa-info"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">עדכון</div>
+                <div class="notification-message">הודעת מערכת</div>
+            </div>
+            <button class="notification-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- מסך התחברות -->
+        <div id="loginSection" class="login-form">
+            <div class="login-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <h2>התחברות למערכת</h2>
+            <p>נא להזין שם משתמש כדי להתחיל להשתמש במערכת</p>
+            
+            <div class="form-group">
+                <label for="userName" class="form-label">שם משתמש</label>
+                <input type="text" id="userName" class="form-input" placeholder="הזן את שמך">
+            </div>
+            
+            <button id="loginButton" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt btn-icon"></i>
+                התחבר
+            </button>
+            <p id="loginStatus"></p>
+        </div>
+        
+        <!-- מסך ראשי -->
+        <div id="mainApp" style="display:none;">
+            <div class="tabs">
+                <div class="tab active" data-tab="uploadTab">
+                    <i class="fas fa-upload tab-icon"></i>
+                    <span class="tab-text">העלאת סרטון</span>
+                </div>
+                <div class="tab" data-tab="resultTab">
+                    <i class="fas fa-search tab-icon"></i>
+                    <span class="tab-text">תוצאות זיהוי</span>
+                </div>
+                <div class="tab" data-tab="settingsTab">
+                    <i class="fas fa-sliders-h tab-icon"></i>
+                    <span class="tab-text">הגדרות</span>
+                </div>
+                <div class="tab-slider"></div>
+            </div>
+            
+            <!-- לשונית העלאת סרטון -->
+            <div id="uploadTab" class="tab-content active">
+                <div class="card">
+                    <div class="card-pattern"></div>
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h2>העלאת סרטון לניתוח</h2>
+                    </div>
+                    <p>בחר סרטון לניתוח וזיהוי אובייקטים. המערכת תזהה אנשים, חיות, רכבים וחפצים שונים בסרטון באיכות גבוהה.</p>
+                    
+                    <div class="file-input-wrapper" id="fileDropArea">
+                        <i class="fas fa-cloud-upload-alt file-input-icon"></i>
+                        <div class="file-input-text">גרור קובץ לכאן או לחץ לבחירה</div>
+                        <div class="file-input-subtext">סרטונים בפורמט MP4, AVI, MOV, עד 500MB</div>
+                        <input type="file" id="videoInput" class="file-input" accept="video/*">
+                        <video id="videoPreview" class="file-preview" style="display: none;"></video>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="processButton" class="btn btn-primary">
+                            <i class="fas fa-play btn-icon"></i>
+                            נתח סרטון
+                        </button>
+                        <button id="clearButton" class="btn btn-secondary">
+                            <i class="fas fa-trash btn-icon"></i>
+                            נקה
+                        </button>
+                    </div>
+                    
+                    <div id="videoContainer" class="video-container" style="display: none;">
+                        <video id="video" controls></video>
+                    </div>
+                    
+                    <div id="progressContainer" class="progress-container">
+                        <div class="progress-bar">
+                            <div id="progressBar" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressStatus">מעבד סרטון...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div id="loader" class="loader"></div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="stats-pattern"></div>
+                    <div class="stats-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stats-value"><span id="usageCount">0</span>/5</div>
+                        <div class="stats-label">שימושים נותרים (מתאפס לאחר 48 שעות)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- לשונית תוצאות זיהוי -->
+            <div id="resultTab" class="tab-content">
+                <div class="card">
+                    <div class="card-pattern"></div>
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h2>תוצאות זיהוי אובייקטים</h2>
+                    </div>
+                    
+                    <div id="resultsStats" class="btn-group">
+                        <div class="stats-card">
+                            <div class="stats-pattern"></div>
+                            <div class="stats-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="stats-content">
+                                <div class="stats-value" id="totalObjects">0</div>
+                                <div class="stats-label">אובייקטים זוהו</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="exportPdfBtn" class="btn btn-primary">
+                            <i class="fas fa-file-pdf btn-icon"></i>
+                            יצירת PDF
+                        </button>
+                        <button id="exportPptxBtn" class="btn btn-secondary">
+                            <i class="fas fa-file-powerpoint btn-icon"></i>
+                            יצירת מצגת
+                        </button>
+                        <button id="exportJsonBtn" class="btn btn-accent">
+                            <i class="fas fa-file-code btn-icon"></i>
+                            ייצוא JSON
+                        </button>
+                    </div>
+                    
+                    <div id="detectionResults">
+                        <canvas id="objectCanvas" width="1920" height="1080" style="display: none;"></canvas>
+                        
+                        <div id="emptyResults" class="empty-state">
+                            <i class="fas fa-search empty-icon"></i>
+                            <h3 class="empty-title">אין תוצאות זיהוי</h3>
+                            <p class="empty-text">העלה סרטון וניתוח אותו כדי לראות את תוצאות זיהוי האובייקטים.</p>
+                            <button class="btn btn-primary" data-action="goto-upload">
+                                <i class="fas fa-upload btn-icon"></i>
+                                העלאת סרטון
+                            </button>
+                        </div>
+                        
+                        <div id="objectsList" class="detection-grid"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- לשונית הגדרות -->
+            <div id="settingsTab" class="tab-content">
+                <div class="card">
+                    <div class="card-pattern"></div>
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h2>הגדרות מתקדמות</h2>
+                    </div>
+                    <p>כוונון פרמטרים לשיפור דיוק הזיהוי ואיכות התמונות. שינויים ישפיעו על ביצועים ואיכות.</p>
+                    
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <div class="setting-title">סף זיהוי מינימלי</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">דיוק מינימלי נדרש לזיהוי אובייקט (0-1). ערך גבוה יותר מקטין שגיאות אך עלול להחמיץ אובייקטים.</span>
+                                </button>
+                            </div>
+                            <div class="slider-container">
+                                <div class="slider-info">
+                                    <span class="slider-label">דיוק מינימלי</span>
+                                    <span class="slider-value" id="confidenceValue">0.6</span>
+                                </div>
+                                <input type="range" id="confidenceThreshold" class="slider" min="0.1" max="0.95" step="0.05" value="0.6">
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-film"></i>
+                                </div>
+                                <div class="setting-title">תדירות דגימת פריימים</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">כמה פריימים לדלג בין דגימות. ערך נמוך משפר דיוק אך מאט את התהליך.</span>
+                                </button>
+                            </div>
+                            <div class="slider-container">
+                                <div class="slider-info">
+                                    <span class="slider-label">דילוג פריימים</span>
+                                    <span class="slider-value" id="frameSkipValue">3</span>
+                                </div>
+                                <input type="range" id="frameSkip" class="slider" min="1" max="30" step="1" value="3">
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-expand"></i>
+                                </div>
+                                <div class="setting-title">הרחבת שוליים</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">מרחיב את גבולות האובייקט שזוהה בפיקסלים נוספים כדי לכלול את כולו.</span>
+                                </button>
+                            </div>
+                            <div class="slider-container">
+                                <div class="slider-info">
+                                    <span class="slider-label">פיקסלים</span>
+                                    <span class="slider-value" id="paddingValue">15</span>
+                                </div>
+                                <input type="range" id="boundingBoxPadding" class="slider" min="0" max="50" step="5" value="15">
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="setting-title">אופטימיזציה למכשירים</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">שליטה אוטומטית בהגדרות ביצועים בהתאם למכשיר. מומלץ להשאיר פעיל.</span>
+                                </button>
+                            </div>
+                            <div class="toggle-container">
+                                <label class="toggle">
+                                    <input type="checkbox" id="deviceOptimization" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">אופטימיזציה אוטומטית</span>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="setting-title">רזולוציית תמונה</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">איכות התמונות המיוצאות. איכות גבוהה יותר דורשת יותר משאבים.</span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <select id="imageQuality" class="form-select">
+                                    <option value="medium">בינונית (720p)</option>
+                                    <option value="high" selected>גבוהה (1080p)</option>
+                                    <option value="ultra">אולטרה (4K)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="setting-title">מודל זיהוי</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">מודלים מדויקים יותר דורשים יותר משאבי מחשב.</span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <select id="modelType" class="form-select">
+                                    <option value="lite">מהיר (מכשירים חלשים)</option>
+                                    <option value="standard">סטנדרטי</option>
+                                    <option value="accurate" selected>מדויק (מומלץ)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <div class="setting-icon">
+                                    <i class="fas fa-magic"></i>
+                                </div>
+                                <div class="setting-title">שיפור איכות תמונה</div>
+                                <button class="setting-tooltip">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltip-text">החלת אלגוריתמי שיפור לאיכות התמונות. עלול להאט את התהליך.</span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <select id="imageEnhancement" class="form-select">
+                                    <option value="none">ללא</option>
+                                    <option value="basic">בסיסי</option>
+                                    <option value="advanced" selected>מתקדם</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="resetSettingsBtn" class="btn btn-danger">
+                            <i class="fas fa-undo btn-icon"></i>
+                            איפוס הגדרות
+                        </button>
+                        <button id="saveSettingsBtn" class="btn btn-accent">
+                            <i class="fas fa-save btn-icon"></i>
+                            שמירת הגדרות
+                        </button>
+                    </div>
+                    
+                    <div class="device-info">
+                        <h3>מידע מערכת</h3>
+                        <div id="deviceInfoContent" class="device-info-content">
+                            טוען מידע...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="site-footer">
+        <div class="container">
+            <p>© AI Vision Pro | פותח באמצעות טכנולוגיות TensorFlow.js</p>
+        </div>
+    </footer>
+    
+    <!-- ספריות חיצוניות - טעינה מאוחרת -->
     <script>
-        // קבועים לזיהוי האותות (זהים לאלו שבאפליקציה)
-        const SAMPLE_RATE = 44100;
-        const START_SIGNAL = 19500;
-        const BIT_0_FREQUENCY = 19000;
-        const BIT_1_FREQUENCY = 19250;
-        const END_SIGNAL = 19750;
-        const FREQUENCY_TOLERANCE = 100;
+        // טעינת ספריות בהדרגה לשיפור ביצועים
+        function loadScript(src, async = true, defer = true) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = async;
+                script.defer = defer;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
         
-        let audioContext;
-        let analyser;
-        let isListening = false;
-        let receivedBits = "";
-        let receiverState = "WAITING";
-        let mediaStream = null;
-        
-        document.getElementById('startListening').addEventListener('click', async () => {
-            if (!isListening) {
-                try {
-                    await startListening();
-                    document.getElementById('startListening').textContent = 'הפסק האזנה';
-                    document.getElementById('startListening').classList.add('active');
-                    updateStatus('מאזין לאותות...');
-                    isListening = true;
-                } catch (error) {
-                    updateStatus('שגיאה: ' + error);
-                }
-            } else {
-                stopListening();
-                document.getElementById('startListening').textContent = 'התחל האזנה';
-                document.getElementById('startListening').classList.remove('active');
-                updateStatus('האזנה הופסקה');
-                isListening = false;
-            }
+        // טעינת סקריפטים מקומיים
+        document.addEventListener('DOMContentLoaded', () => {
+            // טעינת סקריפטים מקומיים בסדר הנכון
+            loadScript('js/config.js')
+                .then(() => loadScript('js/utils.js'))
+                .then(() => loadScript('js/ui.js'))
+                .then(() => loadScript('js/imageProcessing.js'))
+                .then(() => loadScript('js/detection.js'))
+                .then(() => loadScript('js/exports.js'))
+                .then(() => loadScript('js/app.js'))
+                .catch(error => console.error('שגיאה בטעינת סקריפטים:', error));
         });
         
-        async function startListening() {
-            try {
-                // יצירת AudioContext
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // קבלת הרשאת מיקרופון
-                mediaStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    }
-                });
-                
-                const source = audioContext.createMediaStreamSource(mediaStream);
-                
-                // הגדרת Analyser לניתוח תדרים
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 4096; // גודל חלון FFT גדול יותר לרזולוציה טובה יותר
-                analyser.smoothingTimeConstant = 0.2;
-                source.connect(analyser);
-                
-                // הפעלת לולאת ניתוח
-                receiverState = "WAITING";
-                receivedBits = "";
-                requestAnimationFrame(analyzeAudio);
-            } catch (error) {
-                console.error('שגיאה בהתחלת האזנה:', error);
-                throw error;
-            }
-        }
-        
-        function analyzeAudio() {
-            if (!isListening) return;
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-            
-            // זיהוי תדר דומיננטי
-            const dominantFrequency = findDominantFrequency(dataArray);
-            
-            if (dominantFrequency > 18000) { // רק תדרים גבוהים מעניינים אותנו
-                processDetectedFrequency(dominantFrequency);
-            }
-            
-            requestAnimationFrame(analyzeAudio);
-        }
-        
-        function findDominantFrequency(dataArray) {
-            const bufferLength = dataArray.length;
-            let maxValue = 0;
-            let maxIndex = -1;
-            
-            // חיפוש האמפליטודה הגבוהה ביותר
-            for (let i = 0; i < bufferLength; i++) {
-                if (dataArray[i] > maxValue) {
-                    maxValue = dataArray[i];
-                    maxIndex = i;
+        // טעינה דחויה של ספריות חיצוניות
+        window.addEventListener('load', () => {
+            // טעינת TensorFlow בעמוד הראשי רק כשצריך
+            document.getElementById('processButton').addEventListener('click', () => {
+                if (window.tf === undefined) {
+                    Promise.all([
+                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0'),
+                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2'),
+                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0')
+                    ]).then(() => {
+                        console.log('טענו ספריות TensorFlow בהצלחה');
+                        // מפעיל עיבוד וידאו אם כבר לחצו על הכפתור
+                        if (window.pendingVideoProcessing) {
+                            window.pendingVideoProcessing = false;
+                            window.processVideo();
+                        }
+                    });
                 }
-            }
+            });
             
-            // המרה מאינדקס לתדר 
-            if (maxValue > 30) { // סף רעש
-                const nyquist = audioContext.sampleRate / 2;
-                return maxIndex * nyquist / bufferLength;
-            }
-            
-            return -1;
-        }
-        
-        // שומר זמן של הביט האחרון
-        let lastBitTime = 0;
-        let lastBitValue = null;
-        
-        function processDetectedFrequency(frequency) {
-            const now = Date.now();
-            
-            // בדיקה אם התדר קרוב לאחד מהתדרים הידועים
-            if (isFrequencyMatch(frequency, START_SIGNAL)) {
-                if (receiverState === "WAITING") {
-                    receiverState = "RECEIVING";
-                    receivedBits = "";
-                    updateStatus("אות התחלה זוהה! מקבל נתונים...");
-                    console.log("זוהה אות התחלה");
+            // טעינת ספריות ייצוא בעת מעבר ללשונית תוצאות
+            document.querySelector('[data-tab="resultTab"]').addEventListener('click', () => {
+                if (window.pdfMake === undefined) {
+                    Promise.all([
+                        loadScript('https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js'),
+                        loadScript('https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js'),
+                        loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js')
+                    ]).then(() => {
+                        console.log('טענו ספריות ייצוא בהצלחה');
+                    });
                 }
-            } 
-            else if (isFrequencyMatch(frequency, END_SIGNAL)) {
-                if (receiverState === "RECEIVING" && receivedBits.length > 0) {
-                    receiverState = "PROCESSING";
-                    processReceivedData();
-                }
-            } 
-            else if (receiverState === "RECEIVING") {
-                // מניעת קריאות כפולות של אותו ביט
-                if (now - lastBitTime > 50) { // לפחות 50ms מהביט האחרון
-                    let bit = null;
-                    
-                    if (isFrequencyMatch(frequency, BIT_1_FREQUENCY)) {
-                        bit = "1";
-                    } else if (isFrequencyMatch(frequency, BIT_0_FREQUENCY)) {
-                        bit = "0";
-                    }
-                    
-                    // רק אם זוהה ביט חדש שלא זהה לקודם
-                    if (bit !== null && (lastBitValue === null || bit !== lastBitValue)) {
-                        receivedBits += bit;
-                        console.log(`התקבל ביט ${bit}, אורך נוכחי: ${receivedBits.length}`);
-                        
-                        lastBitTime = now;
-                        lastBitValue = bit;
-                    }
-                }
-            }
-        }
-        
-        function isFrequencyMatch(detected, target) {
-            return Math.abs(detected - target) < FREQUENCY_TOLERANCE;
-        }
-        
-        function processReceivedData() {
-            try {
-                // וידוא שמספר הביטים מתחלק ב-8
-                const validLength = Math.floor(receivedBits.length / 8) * 8;
-                if (validLength === 0) {
-                    updateStatus("לא התקבלו מספיק נתונים");
-                    receiverState = "WAITING";
-                    return;
-                }
-                
-                // המרת ביטים לבייטים
-                const bytes = [];
-                for (let i = 0; i < validLength; i += 8) {
-                    const byte = parseInt(receivedBits.substr(i, 8), 2);
-                    bytes.push(byte);
-                }
-                
-                // המרת בייטים לטקסט
-                const decoder = new TextDecoder();
-                const url = decoder.decode(new Uint8Array(bytes));
-                
-                updateStatus(`התקבל URL: ${url}`);
-                
-                // פתיחת הכתובת
-                const fullUrl = url.startsWith('http') ? url : 'https://' + url;
-                window.location.href = fullUrl;
-                
-            } catch (error) {
-                console.error('שגיאה בעיבוד נתונים:', error);
-                updateStatus("שגיאה בעיבוד הנתונים: " + error.message);
-                receiverState = "WAITING";
-            }
-        }
-        
-        function stopListening() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
-            
-            if (audioContext) {
-                audioContext.close();
-            }
-            
-            isListening = false;
-        }
-        
-        function updateStatus(text) {
-            document.getElementById('status').textContent = 'סטטוס: ' + text;
-        }
+            });
+        });
     </script>
 </body>
 </html>
