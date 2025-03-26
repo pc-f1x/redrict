@@ -1,0 +1,345 @@
+<!-- אפליקציית זיהוי אובייקטים - תוכן ראשי -->
+
+<!-- התראות -->
+<div id="notification" class="notification">
+    <div class="notification-icon info">
+        <i class="fas fa-info"></i>
+    </div>
+    <div class="notification-content">
+        <div class="notification-title">עדכון</div>
+        <div class="notification-message">הודעת מערכת</div>
+    </div>
+    <button class="notification-close">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<!-- מסך התחברות -->
+<div id="loginSection" class="login-form">
+    <div class="login-icon">
+        <i class="fas fa-user"></i>
+    </div>
+    <h2>התחברות למערכת</h2>
+    <p>נא להזין שם משתמש כדי להתחיל להשתמש במערכת</p>
+    
+    <div class="form-group">
+        <label for="userName" class="form-label">שם משתמש</label>
+        <input type="text" id="userName" class="form-input" placeholder="הזן את שמך">
+    </div>
+    
+    <button id="loginButton" class="btn btn-primary">
+        <i class="fas fa-sign-in-alt btn-icon"></i>
+        התחבר
+    </button>
+    <p id="loginStatus"></p>
+</div>
+
+<!-- מסך ראשי -->
+<div id="mainApp" style="display:none;">
+    <div class="tabs">
+        <div class="tab active" data-tab="uploadTab">
+            <i class="fas fa-upload tab-icon"></i>
+            <span class="tab-text">העלאת סרטון</span>
+        </div>
+        <div class="tab" data-tab="resultTab">
+            <i class="fas fa-search tab-icon"></i>
+            <span class="tab-text">תוצאות זיהוי</span>
+        </div>
+        <div class="tab" data-tab="settingsTab">
+            <i class="fas fa-sliders-h tab-icon"></i>
+            <span class="tab-text">הגדרות</span>
+        </div>
+        <div class="tab-slider"></div>
+    </div>
+    
+    <!-- לשונית העלאת סרטון -->
+    <div id="uploadTab" class="tab-content active">
+        <div class="card">
+            <div class="card-pattern"></div>
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h2>העלאת סרטון לניתוח</h2>
+            </div>
+            <p>בחר סרטון לניתוח וזיהוי אובייקטים. המערכת תזהה אנשים, חיות, רכבים וחפצים שונים בסרטון באיכות גבוהה.</p>
+            
+            <div class="file-input-wrapper" id="fileDropArea">
+                <i class="fas fa-cloud-upload-alt file-input-icon"></i>
+                <div class="file-input-text">גרור קובץ לכאן או לחץ לבחירה</div>
+                <div class="file-input-subtext">סרטונים בפורמט MP4, AVI, MOV, עד 500MB</div>
+                <input type="file" id="videoInput" class="file-input" accept="video/*">
+                <video id="videoPreview" class="file-preview" style="display: none;"></video>
+            </div>
+            
+            <div class="btn-group">
+                <button id="processButton" class="btn btn-primary">
+                    <i class="fas fa-play btn-icon"></i>
+                    נתח סרטון
+                </button>
+                <button id="clearButton" class="btn btn-secondary">
+                    <i class="fas fa-trash btn-icon"></i>
+                    נקה
+                </button>
+            </div>
+            
+            <div id="videoContainer" class="video-container" style="display: none;">
+                <video id="video" controls></video>
+            </div>
+            
+            <div id="progressContainer" class="progress-container">
+                <div class="progress-bar">
+                    <div id="progressBar" class="progress-fill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressStatus">מעבד סרטון...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <div id="loader" class="loader"></div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stats-pattern"></div>
+            <div class="stats-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="stats-content">
+                <div class="stats-value"><span id="usageCount">0</span>/5</div>
+                <div class="stats-label">שימושים נותרים (מתאפס לאחר 48 שעות)</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- לשונית תוצאות זיהוי -->
+    <div id="resultTab" class="tab-content">
+        <div class="card">
+            <div class="card-pattern"></div>
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h2>תוצאות זיהוי אובייקטים</h2>
+            </div>
+            
+            <div id="resultsStats" class="btn-group">
+                <div class="stats-card">
+                    <div class="stats-pattern"></div>
+                    <div class="stats-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stats-value" id="totalObjects">0</div>
+                        <div class="stats-label">אובייקטים זוהו</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="exportPdfBtn" class="btn btn-primary">
+                    <i class="fas fa-file-pdf btn-icon"></i>
+                    יצירת PDF
+                </button>
+                <button id="exportPptxBtn" class="btn btn-secondary">
+                    <i class="fas fa-file-powerpoint btn-icon"></i>
+                    יצירת מצגת
+                </button>
+                <button id="exportJsonBtn" class="btn btn-accent">
+                    <i class="fas fa-file-code btn-icon"></i>
+                    ייצוא JSON
+                </button>
+            </div>
+            
+            <div id="detectionResults">
+                <canvas id="objectCanvas" width="1920" height="1080" style="display: none;"></canvas>
+                
+                <div id="emptyResults" class="empty-state">
+                    <i class="fas fa-search empty-icon"></i>
+                    <h3 class="empty-title">אין תוצאות זיהוי</h3>
+                    <p class="empty-text">העלה סרטון וניתוח אותו כדי לראות את תוצאות זיהוי האובייקטים.</p>
+                    <button class="btn btn-primary" data-action="goto-upload">
+                        <i class="fas fa-upload btn-icon"></i>
+                        העלאת סרטון
+                    </button>
+                </div>
+                
+                <div id="objectsList" class="detection-grid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- לשונית הגדרות -->
+    <div id="settingsTab" class="tab-content">
+        <div class="card">
+            <div class="card-pattern"></div>
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h2>הגדרות מתקדמות</h2>
+            </div>
+            <p>כוונון פרמטרים לשיפור דיוק הזיהוי ואיכות התמונות.</p>
+            
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="setting-title">סף זיהוי מינימלי</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">דיוק מינימלי נדרש לזיהוי אובייקט (0-1). ערך גבוה יותר מקטין שגיאות אך עלול להחמיץ אובייקטים.</span>
+                        </button>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-info">
+                            <span class="slider-label">דיוק מינימלי</span>
+                            <span class="slider-value" id="confidenceValue">0.6</span>
+                        </div>
+                        <input type="range" id="confidenceThreshold" class="slider" min="0.1" max="0.95" step="0.05" value="0.6">
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="setting-title">תדירות דגימת פריימים</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">כמה פריימים לדלג בין דגימות. ערך נמוך משפר דיוק אך מאט את התהליך.</span>
+                        </button>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-info">
+                            <span class="slider-label">דילוג פריימים</span>
+                            <span class="slider-value" id="frameSkipValue">3</span>
+                        </div>
+                        <input type="range" id="frameSkip" class="slider" min="1" max="30" step="1" value="3">
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                        <div class="setting-title">הרחבת שוליים</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">מרחיב את גבולות האובייקט שזוהה בפיקסלים נוספים כדי לכלול את כולו.</span>
+                        </button>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-info">
+                            <span class="slider-label">פיקסלים</span>
+                            <span class="slider-value" id="paddingValue">15</span>
+                        </div>
+                        <input type="range" id="boundingBoxPadding" class="slider" min="0" max="50" step="5" value="15">
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="setting-title">אופטימיזציה למכשירים</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">שליטה אוטומטית בהגדרות ביצועים בהתאם למכשיר. מומלץ להשאיר פעיל.</span>
+                        </button>
+                    </div>
+                    <div class="toggle-container">
+                        <label class="toggle">
+                            <input type="checkbox" id="deviceOptimization" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">אופטימיזציה אוטומטית</span>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="setting-title">רזולוציית תמונה</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">איכות התמונות המיוצאות. איכות גבוהה יותר דורשת יותר משאבים.</span>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <select id="imageQuality" class="form-select">
+                            <option value="medium">בינונית (720p)</option>
+                            <option value="high" selected>גבוהה (1080p)</option>
+                            <option value="ultra">אולטרה (4K)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="setting-title">מודל זיהוי</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">מודלים מדויקים יותר דורשים יותר משאבי מחשב.</span>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <select id="modelType" class="form-select">
+                            <option value="lite">מהיר (מכשירים חלשים)</option>
+                            <option value="standard">סטנדרטי</option>
+                            <option value="accurate" selected>מדויק (מומלץ)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div class="setting-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <div class="setting-title">שיפור איכות תמונה</div>
+                        <button class="setting-tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">החלת אלגוריתמי שיפור לאיכות התמונות. עלול להאט את התהליך.</span>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <select id="imageEnhancement" class="form-select">
+                            <option value="none">ללא</option>
+                            <option value="basic">בסיסי</option>
+                            <option value="advanced" selected>מתקדם</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="resetSettingsBtn" class="btn btn-danger">
+                    <i class="fas fa-undo btn-icon"></i>
+                    איפוס הגדרות
+                </button>
+                <button id="saveSettingsBtn" class="btn btn-accent">
+                    <i class="fas fa-save btn-icon"></i>
+                    שמירת הגדרות
+                </button>
+            </div>
+            
+            <div class="device-info">
+                <h3>מידע מערכת</h3>
+                <div id="deviceInfoContent" class="device-info-content">
+                    טוען מידע...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
