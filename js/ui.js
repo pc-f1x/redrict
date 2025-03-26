@@ -7,7 +7,7 @@ const UI = {
         activeTab: 'uploadTab',
         isProcessing: false,
         videoSelected: false,
-        currentSettings: { ...CONFIG.defaults }
+        currentSettings: null
     },
     
     /**
@@ -15,17 +15,46 @@ const UI = {
      * @returns {void}
      */
     init: function() {
+        console.log('מאתחל ממשק משתמש...');
+        
+        // טעינת הגדרות ברירת מחדל אם CONFIG קיים
+        if (window.CONFIG) {
+            this.state.currentSettings = { ...CONFIG.defaults };
+        } else {
+            // הגדרות בסיסיות אם CONFIG חסר
+            this.state.currentSettings = {
+                confidenceThreshold: 0.6,
+                frameSkip: 3,
+                imageQuality: 'high',
+                modelType: 'accurate',
+                imageEnhancement: 'advanced',
+                boundingBoxPadding: 15,
+                deviceOptimization: true
+            };
+        }
+        
+        // חיבור מאזיני אירועים
         this.attachEventListeners();
         this.setupTabSystem();
         this.setupFileInput();
         this.setupSettingsUI();
-        this.updateDeviceInfo();
         
-        // בדיקת אופטימיזציה למכשיר
-        const device = UTILS.detectDevice();
-        if (device.isMobile) {
-            this.applyMobileOptimizations();
+        // אם UTILS קיים, השתמש בו לקבלת מידע מכשיר
+        if (window.UTILS) {
+            this.updateDeviceInfo();
+            
+            // בדיקת אופטימיזציה למכשיר
+            const device = UTILS.detectDevice();
+            if (device.isMobile) {
+                this.applyMobileOptimizations();
+            }
+        } else {
+            // עדכון מידע מערכת בסיסי
+            document.getElementById('deviceInfoContent').textContent = 
+                `דפדפן: ${navigator.userAgent}\nמסך: ${window.innerWidth}x${window.innerHeight}`;
         }
+        
+        console.log('ממשק משתמש אותחל בהצלחה');
     },
     
     /**
@@ -41,18 +70,27 @@ const UI = {
             });
         });
         
-        // נגיעה במסך לסגירת התראות
+        // טיפול בהתראות
         document.querySelector('.notification-close').addEventListener('click', () => {
             this.hideNotification();
         });
         
         // כפתורי התחברות ועיבוד
         document.getElementById('loginButton').addEventListener('click', () => {
-            APP.registerUser();
+            if (window.APP && typeof APP.registerUser === 'function') {
+                APP.registerUser();
+            } else {
+                // גישה ישירה אם APP לא קיים
+                handleLogin();
+            }
         });
         
         document.getElementById('processButton').addEventListener('click', () => {
-            APP.processVideo();
+            if (window.APP && typeof APP.processVideo === 'function') {
+                APP.processVideo();
+            } else {
+                this.showNotification('לא ניתן לבצע עיבוד - מודול העיבוד לא נטען', 'error');
+            }
         });
         
         document.getElementById('clearButton').addEventListener('click', () => {
@@ -61,15 +99,27 @@ const UI = {
         
         // כפתורי ייצוא
         document.getElementById('exportPdfBtn').addEventListener('click', () => {
-            EXPORTS.generatePDF();
+            if (window.EXPORTS && typeof EXPORTS.generatePDF === 'function') {
+                EXPORTS.generatePDF();
+            } else {
+                this.showNotification('מודול הייצוא לא נטען כראוי', 'error');
+            }
         });
         
         document.getElementById('exportPptxBtn').addEventListener('click', () => {
-            EXPORTS.generatePPTX();
+            if (window.EXPORTS && typeof EXPORTS.generatePPTX === 'function') {
+                EXPORTS.generatePPTX();
+            } else {
+                this.showNotification('מודול הייצוא לא נטען כראוי', 'error');
+            }
         });
         
         document.getElementById('exportJsonBtn').addEventListener('click', () => {
-            EXPORTS.exportJSON();
+            if (window.EXPORTS && typeof EXPORTS.exportJSON === 'function') {
+                EXPORTS.exportJSON();
+            } else {
+                this.showNotification('מודול הייצוא לא נטען כראוי', 'error');
+            }
         });
         
         // כפתורי הגדרות
@@ -155,8 +205,10 @@ const UI = {
             const files = dt.files;
             
             if (files.length > 0 && files[0].type.startsWith('video/')) {
-                if (files[0].size > CONFIG.app.maxVideoSize) {
-                    this.showNotification('הקובץ גדול מדי. גודל מקסימלי: ' + UTILS.formatFileSize(CONFIG.app.maxVideoSize), 'error');
+                const maxSize = (window.CONFIG && CONFIG.app.maxVideoSize) || (500 * 1024 * 1024);
+                
+                if (files[0].size > maxSize) {
+                    this.showNotification('הקובץ גדול מדי. גודל מקסימלי: 500MB', 'error');
                     return;
                 }
                 
@@ -170,8 +222,10 @@ const UI = {
         // טיפול בשינוי קובץ רגיל
         videoInput.addEventListener('change', () => {
             if (videoInput.files.length > 0) {
-                if (videoInput.files[0].size > CONFIG.app.maxVideoSize) {
-                    this.showNotification('הקובץ גדול מדי. גודל מקסימלי: ' + UTILS.formatFileSize(CONFIG.app.maxVideoSize), 'error');
+                const maxSize = (window.CONFIG && CONFIG.app.maxVideoSize) || (500 * 1024 * 1024);
+                
+                if (videoInput.files[0].size > maxSize) {
+                    this.showNotification('הקובץ גדול מדי. גודל מקסימלי: 500MB', 'error');
                     videoInput.value = '';
                     return;
                 }
@@ -187,23 +241,40 @@ const UI = {
      */
     setupSettingsUI: function() {
         // טעינת הגדרות שמורות
-        const savedSettings = UTILS.loadFromStorage('settings', CONFIG.defaults);
-        this.state.currentSettings = { ...savedSettings };
+        let savedSettings = null;
+        
+        if (window.UTILS && typeof UTILS.loadFromStorage === 'function') {
+            savedSettings = UTILS.loadFromStorage('settings', this.state.currentSettings);
+        } else {
+            // ניסיון לטעון מלוקל סטורג' ישירות
+            try {
+                const storedSettings = localStorage.getItem('ai_vision_pro_settings');
+                if (storedSettings) {
+                    savedSettings = JSON.parse(storedSettings);
+                }
+            } catch (e) {
+                console.warn('שגיאה בטעינת הגדרות:', e);
+            }
+        }
+        
+        if (savedSettings) {
+            this.state.currentSettings = { ...this.state.currentSettings, ...savedSettings };
+        }
         
         // עדכון ממשק המשתמש עם ההגדרות השמורות
-        document.getElementById('confidenceThreshold').value = savedSettings.confidenceThreshold;
-        document.getElementById('confidenceValue').textContent = savedSettings.confidenceThreshold;
+        document.getElementById('confidenceThreshold').value = this.state.currentSettings.confidenceThreshold;
+        document.getElementById('confidenceValue').textContent = this.state.currentSettings.confidenceThreshold;
         
-        document.getElementById('frameSkip').value = savedSettings.frameSkip;
-        document.getElementById('frameSkipValue').textContent = savedSettings.frameSkip;
+        document.getElementById('frameSkip').value = this.state.currentSettings.frameSkip;
+        document.getElementById('frameSkipValue').textContent = this.state.currentSettings.frameSkip;
         
-        document.getElementById('boundingBoxPadding').value = savedSettings.boundingBoxPadding;
-        document.getElementById('paddingValue').textContent = savedSettings.boundingBoxPadding;
+        document.getElementById('boundingBoxPadding').value = this.state.currentSettings.boundingBoxPadding;
+        document.getElementById('paddingValue').textContent = this.state.currentSettings.boundingBoxPadding;
         
-        document.getElementById('imageQuality').value = savedSettings.imageQuality;
-        document.getElementById('modelType').value = savedSettings.modelType;
-        document.getElementById('imageEnhancement').value = savedSettings.imageEnhancement;
-        document.getElementById('deviceOptimization').checked = savedSettings.deviceOptimization;
+        document.getElementById('imageQuality').value = this.state.currentSettings.imageQuality;
+        document.getElementById('modelType').value = this.state.currentSettings.modelType;
+        document.getElementById('imageEnhancement').value = this.state.currentSettings.imageEnhancement;
+        document.getElementById('deviceOptimization').checked = this.state.currentSettings.deviceOptimization;
         
         // מאזיני אירועים להגדרות
         document.getElementById('confidenceThreshold').addEventListener('input', (e) => {
@@ -348,15 +419,12 @@ const UI = {
         
         // הפעלת הלשונית הנבחרת
         document.getElementById(tabName).classList.add('active');
-        const tabButton = document.querySelector(`.tab[data-tab="${tabName}"]`);
+        document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
         
-        if (tabButton) {
-            tabButton.classList.add('active');
-            this.state.activeTab = tabName;
+        this.state.activeTab = tabName;
             
-            // עדכון סליידר
-            this.updateTabSlider();
-        }
+        // עדכון סליידר
+        this.updateTabSlider();
     },
     
     /**
@@ -367,6 +435,8 @@ const UI = {
      */
     showNotification: function(message, type = 'info') {
         const notification = document.getElementById('notification');
+        if (!notification) return;
+        
         const notificationIcon = notification.querySelector('.notification-icon');
         const notificationTitle = notification.querySelector('.notification-title');
         const notificationMessage = notification.querySelector('.notification-message');
@@ -409,7 +479,9 @@ const UI = {
      */
     hideNotification: function() {
         const notification = document.getElementById('notification');
-        notification.classList.remove('show');
+        if (notification) {
+            notification.classList.remove('show');
+        }
     },
     
     /**
@@ -423,6 +495,8 @@ const UI = {
         const progressBar = document.getElementById('progressBar');
         const progressPercent = document.getElementById('progressPercent');
         const progressStatus = document.getElementById('progressStatus');
+        
+        if (!progressContainer || !progressBar || !progressPercent || !progressStatus) return;
         
         // הצגת מחוון ההתקדמות
         progressContainer.style.display = 'block';
@@ -440,7 +514,9 @@ const UI = {
      */
     toggleLoader: function(show) {
         const loader = document.getElementById('loader');
-        loader.style.display = show ? 'block' : 'none';
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
+        }
     },
     
     /**
@@ -452,6 +528,8 @@ const UI = {
         const objectsList = document.getElementById('objectsList');
         const emptyResults = document.getElementById('emptyResults');
         const totalObjects = document.getElementById('totalObjects');
+        
+        if (!objectsList || !emptyResults || !totalObjects) return;
         
         // עדכון מספר אובייקטים
         totalObjects.textContent = objects.length;
@@ -476,7 +554,12 @@ const UI = {
             const displayName = object.refinedClassName || object.className;
             
             // יצירת קישור לחיפוש גוגל עם תמונה
-            const googleSearchUrl = UTILS.createGoogleLensUrl(object.thumbnail);
+            let googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(displayName)}`;
+            
+            // אם UTILS קיים, השתמש בו ליצירת קישור חיפוש תמונה
+            if (window.UTILS && typeof UTILS.createGoogleLensUrl === 'function') {
+                googleSearchUrl = UTILS.createGoogleLensUrl(object.thumbnail);
+            }
             
             objectElement.innerHTML = `
                 <div class="object-image-container">
@@ -491,7 +574,7 @@ const UI = {
                     <div class="object-meta">
                         <div class="object-meta-item">
                             <i class="fas fa-clock object-meta-icon"></i>
-                            ${UTILS.formatTime(object.frameTime)}
+                            ${typeof UTILS !== 'undefined' ? UTILS.formatTime(object.frameTime) : Math.round(object.frameTime) + 's'}
                         </div>
                     </div>
                     <div class="object-actions">
@@ -529,7 +612,17 @@ const UI = {
      * @returns {void}
      */
     saveSettings: function() {
-        UTILS.saveToStorage('settings', this.state.currentSettings);
+        if (window.UTILS && typeof UTILS.saveToStorage === 'function') {
+            UTILS.saveToStorage('settings', this.state.currentSettings);
+        } else {
+            // שמירה ישירה ללוקל סטורג'
+            try {
+                localStorage.setItem('ai_vision_pro_settings', JSON.stringify(this.state.currentSettings));
+            } catch (e) {
+                console.warn('שגיאה בשמירת הגדרות:', e);
+            }
+        }
+        
         this.showNotification('ההגדרות נשמרו בהצלחה', 'success');
     },
     
@@ -538,24 +631,45 @@ const UI = {
      * @returns {void}
      */
     resetSettings: function() {
-        this.state.currentSettings = { ...CONFIG.defaults };
+        // הגדרות ברירת מחדל
+        const defaults = (window.CONFIG && CONFIG.defaults) || {
+            confidenceThreshold: 0.6,
+            frameSkip: 3,
+            imageQuality: 'high',
+            modelType: 'accurate',
+            imageEnhancement: 'advanced',
+            boundingBoxPadding: 15,
+            deviceOptimization: true
+        };
+        
+        this.state.currentSettings = { ...defaults };
         
         // עדכון ממשק המשתמש
-        document.getElementById('confidenceThreshold').value = CONFIG.defaults.confidenceThreshold;
-        document.getElementById('confidenceValue').textContent = CONFIG.defaults.confidenceThreshold;
+        document.getElementById('confidenceThreshold').value = defaults.confidenceThreshold;
+        document.getElementById('confidenceValue').textContent = defaults.confidenceThreshold;
         
-        document.getElementById('frameSkip').value = CONFIG.defaults.frameSkip;
-        document.getElementById('frameSkipValue').textContent = CONFIG.defaults.frameSkip;
+        document.getElementById('frameSkip').value = defaults.frameSkip;
+        document.getElementById('frameSkipValue').textContent = defaults.frameSkip;
         
-        document.getElementById('boundingBoxPadding').value = CONFIG.defaults.boundingBoxPadding;
-        document.getElementById('paddingValue').textContent = CONFIG.defaults.boundingBoxPadding;
+        document.getElementById('boundingBoxPadding').value = defaults.boundingBoxPadding;
+        document.getElementById('paddingValue').textContent = defaults.boundingBoxPadding;
         
-        document.getElementById('imageQuality').value = CONFIG.defaults.imageQuality;
-        document.getElementById('modelType').value = CONFIG.defaults.modelType;
-        document.getElementById('imageEnhancement').value = CONFIG.defaults.imageEnhancement;
-        document.getElementById('deviceOptimization').checked = CONFIG.defaults.deviceOptimization;
+        document.getElementById('imageQuality').value = defaults.imageQuality;
+        document.getElementById('modelType').value = defaults.modelType;
+        document.getElementById('imageEnhancement').value = defaults.imageEnhancement;
+        document.getElementById('deviceOptimization').checked = defaults.deviceOptimization;
         
-        UTILS.saveToStorage('settings', this.state.currentSettings);
+        // הסרה מהאחסון
+        if (window.UTILS && typeof UTILS.saveToStorage === 'function') {
+            UTILS.saveToStorage('settings', defaults);
+        } else {
+            try {
+                localStorage.setItem('ai_vision_pro_settings', JSON.stringify(defaults));
+            } catch (e) {
+                console.warn('שגיאה באיפוס הגדרות:', e);
+            }
+        }
+        
         this.showNotification('ההגדרות אופסו לברירת המחדל', 'success');
     },
     
@@ -564,8 +678,12 @@ const UI = {
      * @returns {void}
      */
     updateDeviceInfo: function() {
+        if (!window.UTILS) return;
+        
         const deviceInfoContent = document.getElementById('deviceInfoContent');
-        deviceInfoContent.textContent = UTILS.getSystemInfo();
+        if (deviceInfoContent) {
+            deviceInfoContent.textContent = UTILS.getSystemInfo();
+        }
     },
     
     /**
@@ -573,13 +691,35 @@ const UI = {
      * @returns {void}
      */
     applyMobileOptimizations: function() {
-        if (!this.state.currentSettings.deviceOptimization) {
+        if (!this.state.currentSettings.deviceOptimization || !window.UTILS) {
             return;
         }
         
         const device = UTILS.detectDevice();
         const optimizationType = device.optimization || 'mobile';
-        const optimizations = CONFIG.deviceOptimizations[optimizationType];
+        let optimizations = null;
+        
+        if (window.CONFIG && CONFIG.deviceOptimizations) {
+            optimizations = CONFIG.deviceOptimizations[optimizationType];
+        } else {
+            // הגדרות ברירת מחדל אם CONFIG חסר
+            const mobileOptimizations = {
+                frameSkip: 10,
+                imageQuality: 'medium',
+                modelType: 'lite',
+                imageEnhancement: 'basic'
+            };
+            
+            const lowPowerOptimizations = {
+                frameSkip: 15,
+                imageQuality: 'medium',
+                modelType: 'lite',
+                imageEnhancement: 'none'
+            };
+            
+            optimizations = (optimizationType === 'lowPower') ? 
+                lowPowerOptimizations : mobileOptimizations;
+        }
         
         if (optimizations) {
             // התאמת הגדרות לפי סוג המכשיר
@@ -603,3 +743,11 @@ const UI = {
         }
     }
 };
+
+// הרישום של UI כמודול גלובלי, גם אם הוא נטען בצורה שונה
+window.UI = UI;
+
+// אם יש פונקציית אתחול חיצונית, נפעיל אותה
+if (typeof initUIComplete === 'function') {
+    initUIComplete();
+}
