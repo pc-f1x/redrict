@@ -7,22 +7,19 @@
     <meta name="description" content="מערכת זיהוי אובייקטים חכמה המזהה אנשים, חיות ורכבים מתוך סרטונים באמצעות בינה מלאכותית">
     <meta name="theme-color" content="#3563E9">
     
-    <!-- אופטימיזציה לטעינת סגנונות -->
-    <link rel="preload" href="css/main.css" as="style">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 900px)">
-    
     <!-- גופנים -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <!-- סגנונות -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 900px)">
+    
     <!-- אייקונים -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
-          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
     <!-- Progressive Web App -->
     <link rel="manifest" href="manifest.json">
@@ -43,350 +40,8 @@
         </div>
     </header>
     
-    <div class="container">
-        <!-- הודעות מערכת -->
-        <div id="notification" class="notification">
-            <div class="notification-icon info">
-                <i class="fas fa-info"></i>
-            </div>
-            <div class="notification-content">
-                <div class="notification-title">עדכון</div>
-                <div class="notification-message">הודעת מערכת</div>
-            </div>
-            <button class="notification-close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <!-- מסך התחברות -->
-        <div id="loginSection" class="login-form">
-            <div class="login-icon">
-                <i class="fas fa-user"></i>
-            </div>
-            <h2>התחברות למערכת</h2>
-            <p>נא להזין שם משתמש כדי להתחיל להשתמש במערכת</p>
-            
-            <div class="form-group">
-                <label for="userName" class="form-label">שם משתמש</label>
-                <input type="text" id="userName" class="form-input" placeholder="הזן את שמך">
-            </div>
-            
-            <button id="loginButton" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt btn-icon"></i>
-                התחבר
-            </button>
-            <p id="loginStatus"></p>
-        </div>
-        
-        <!-- מסך ראשי -->
-        <div id="mainApp" style="display:none;">
-            <div class="tabs">
-                <div class="tab active" data-tab="uploadTab">
-                    <i class="fas fa-upload tab-icon"></i>
-                    <span class="tab-text">העלאת סרטון</span>
-                </div>
-                <div class="tab" data-tab="resultTab">
-                    <i class="fas fa-search tab-icon"></i>
-                    <span class="tab-text">תוצאות זיהוי</span>
-                </div>
-                <div class="tab" data-tab="settingsTab">
-                    <i class="fas fa-sliders-h tab-icon"></i>
-                    <span class="tab-text">הגדרות</span>
-                </div>
-                <div class="tab-slider"></div>
-            </div>
-            
-            <!-- לשונית העלאת סרטון -->
-            <div id="uploadTab" class="tab-content active">
-                <div class="card">
-                    <div class="card-pattern"></div>
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <h2>העלאת סרטון לניתוח</h2>
-                    </div>
-                    <p>בחר סרטון לניתוח וזיהוי אובייקטים. המערכת תזהה אנשים, חיות, רכבים וחפצים שונים בסרטון באיכות גבוהה.</p>
-                    
-                    <div class="file-input-wrapper" id="fileDropArea">
-                        <i class="fas fa-cloud-upload-alt file-input-icon"></i>
-                        <div class="file-input-text">גרור קובץ לכאן או לחץ לבחירה</div>
-                        <div class="file-input-subtext">סרטונים בפורמט MP4, AVI, MOV, עד 500MB</div>
-                        <input type="file" id="videoInput" class="file-input" accept="video/*">
-                        <video id="videoPreview" class="file-preview" style="display: none;"></video>
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button id="processButton" class="btn btn-primary">
-                            <i class="fas fa-play btn-icon"></i>
-                            נתח סרטון
-                        </button>
-                        <button id="clearButton" class="btn btn-secondary">
-                            <i class="fas fa-trash btn-icon"></i>
-                            נקה
-                        </button>
-                    </div>
-                    
-                    <div id="videoContainer" class="video-container" style="display: none;">
-                        <video id="video" controls></video>
-                    </div>
-                    
-                    <div id="progressContainer" class="progress-container">
-                        <div class="progress-bar">
-                            <div id="progressBar" class="progress-fill"></div>
-                        </div>
-                        <div class="progress-text">
-                            <span id="progressStatus">מעבד סרטון...</span>
-                            <span id="progressPercent">0%</span>
-                        </div>
-                    </div>
-                    
-                    <div id="loader" class="loader"></div>
-                </div>
-                
-                <div class="stats-card">
-                    <div class="stats-pattern"></div>
-                    <div class="stats-icon">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
-                    <div class="stats-content">
-                        <div class="stats-value"><span id="usageCount">0</span>/5</div>
-                        <div class="stats-label">שימושים נותרים (מתאפס לאחר 48 שעות)</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- לשונית תוצאות זיהוי -->
-            <div id="resultTab" class="tab-content">
-                <div class="card">
-                    <div class="card-pattern"></div>
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h2>תוצאות זיהוי אובייקטים</h2>
-                    </div>
-                    
-                    <div id="resultsStats" class="btn-group">
-                        <div class="stats-card">
-                            <div class="stats-pattern"></div>
-                            <div class="stats-icon">
-                                <i class="fas fa-cube"></i>
-                            </div>
-                            <div class="stats-content">
-                                <div class="stats-value" id="totalObjects">0</div>
-                                <div class="stats-label">אובייקטים זוהו</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button id="exportPdfBtn" class="btn btn-primary">
-                            <i class="fas fa-file-pdf btn-icon"></i>
-                            יצירת PDF
-                        </button>
-                        <button id="exportPptxBtn" class="btn btn-secondary">
-                            <i class="fas fa-file-powerpoint btn-icon"></i>
-                            יצירת מצגת
-                        </button>
-                        <button id="exportJsonBtn" class="btn btn-accent">
-                            <i class="fas fa-file-code btn-icon"></i>
-                            ייצוא JSON
-                        </button>
-                    </div>
-                    
-                    <div id="detectionResults">
-                        <canvas id="objectCanvas" width="1920" height="1080" style="display: none;"></canvas>
-                        
-                        <div id="emptyResults" class="empty-state">
-                            <i class="fas fa-search empty-icon"></i>
-                            <h3 class="empty-title">אין תוצאות זיהוי</h3>
-                            <p class="empty-text">העלה סרטון וניתוח אותו כדי לראות את תוצאות זיהוי האובייקטים.</p>
-                            <button class="btn btn-primary" data-action="goto-upload">
-                                <i class="fas fa-upload btn-icon"></i>
-                                העלאת סרטון
-                            </button>
-                        </div>
-                        
-                        <div id="objectsList" class="detection-grid"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- לשונית הגדרות -->
-            <div id="settingsTab" class="tab-content">
-                <div class="card">
-                    <div class="card-pattern"></div>
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <h2>הגדרות מתקדמות</h2>
-                    </div>
-                    <p>כוונון פרמטרים לשיפור דיוק הזיהוי ואיכות התמונות. שינויים ישפיעו על ביצועים ואיכות.</p>
-                    
-                    <div class="settings-grid">
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-percentage"></i>
-                                </div>
-                                <div class="setting-title">סף זיהוי מינימלי</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">דיוק מינימלי נדרש לזיהוי אובייקט (0-1). ערך גבוה יותר מקטין שגיאות אך עלול להחמיץ אובייקטים.</span>
-                                </button>
-                            </div>
-                            <div class="slider-container">
-                                <div class="slider-info">
-                                    <span class="slider-label">דיוק מינימלי</span>
-                                    <span class="slider-value" id="confidenceValue">0.6</span>
-                                </div>
-                                <input type="range" id="confidenceThreshold" class="slider" min="0.1" max="0.95" step="0.05" value="0.6">
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-film"></i>
-                                </div>
-                                <div class="setting-title">תדירות דגימת פריימים</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">כמה פריימים לדלג בין דגימות. ערך נמוך משפר דיוק אך מאט את התהליך.</span>
-                                </button>
-                            </div>
-                            <div class="slider-container">
-                                <div class="slider-info">
-                                    <span class="slider-label">דילוג פריימים</span>
-                                    <span class="slider-value" id="frameSkipValue">3</span>
-                                </div>
-                                <input type="range" id="frameSkip" class="slider" min="1" max="30" step="1" value="3">
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-expand"></i>
-                                </div>
-                                <div class="setting-title">הרחבת שוליים</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">מרחיב את גבולות האובייקט שזוהה בפיקסלים נוספים כדי לכלול את כולו.</span>
-                                </button>
-                            </div>
-                            <div class="slider-container">
-                                <div class="slider-info">
-                                    <span class="slider-label">פיקסלים</span>
-                                    <span class="slider-value" id="paddingValue">15</span>
-                                </div>
-                                <input type="range" id="boundingBoxPadding" class="slider" min="0" max="50" step="5" value="15">
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div class="setting-title">אופטימיזציה למכשירים</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">שליטה אוטומטית בהגדרות ביצועים בהתאם למכשיר. מומלץ להשאיר פעיל.</span>
-                                </button>
-                            </div>
-                            <div class="toggle-container">
-                                <label class="toggle">
-                                    <input type="checkbox" id="deviceOptimization" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-label">אופטימיזציה אוטומטית</span>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                                <div class="setting-title">רזולוציית תמונה</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">איכות התמונות המיוצאות. איכות גבוהה יותר דורשת יותר משאבים.</span>
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <select id="imageQuality" class="form-select">
-                                    <option value="medium">בינונית (720p)</option>
-                                    <option value="high" selected>גבוהה (1080p)</option>
-                                    <option value="ultra">אולטרה (4K)</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="setting-title">מודל זיהוי</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">מודלים מדויקים יותר דורשים יותר משאבי מחשב.</span>
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <select id="modelType" class="form-select">
-                                    <option value="lite">מהיר (מכשירים חלשים)</option>
-                                    <option value="standard">סטנדרטי</option>
-                                    <option value="accurate" selected>מדויק (מומלץ)</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-card">
-                            <div class="setting-header">
-                                <div class="setting-icon">
-                                    <i class="fas fa-magic"></i>
-                                </div>
-                                <div class="setting-title">שיפור איכות תמונה</div>
-                                <button class="setting-tooltip">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span class="tooltip-text">החלת אלגוריתמי שיפור לאיכות התמונות. עלול להאט את התהליך.</span>
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <select id="imageEnhancement" class="form-select">
-                                    <option value="none">ללא</option>
-                                    <option value="basic">בסיסי</option>
-                                    <option value="advanced" selected>מתקדם</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button id="resetSettingsBtn" class="btn btn-danger">
-                            <i class="fas fa-undo btn-icon"></i>
-                            איפוס הגדרות
-                        </button>
-                        <button id="saveSettingsBtn" class="btn btn-accent">
-                            <i class="fas fa-save btn-icon"></i>
-                            שמירת הגדרות
-                        </button>
-                    </div>
-                    
-                    <div class="device-info">
-                        <h3>מידע מערכת</h3>
-                        <div id="deviceInfoContent" class="device-info-content">
-                            טוען מידע...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container" id="app-container">
+        <!-- תוכן מועתק מקובץ app-content.html -->
     </div>
     
     <footer class="site-footer">
@@ -395,67 +50,218 @@
         </div>
     </footer>
     
-    <!-- ספריות חיצוניות - טעינה מאוחרת -->
+    <!-- סקריפט לניהול טעינה ואתחול -->
     <script>
-        // טעינת ספריות בהדרגה לשיפור ביצועים
-        function loadScript(src, async = true, defer = true) {
+        // טעינת תוכן האפליקציה
+        fetch('app-content.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('app-container').innerHTML = html;
+                console.log('תוכן האפליקציה נטען');
+                // בדיקה שטעינת התוכן הושלמה
+                initApp();
+            })
+            .catch(error => {
+                console.error('שגיאה בטעינת תוכן האפליקציה:', error);
+                document.getElementById('app-container').innerHTML = `
+                    <div style="text-align: center; margin: 50px 0;">
+                        <h2>שגיאה בטעינת האפליקציה</h2>
+                        <p>נא לוודא שקובץ app-content.html קיים וזמין.</p>
+                        <button onclick="location.reload()" class="btn btn-primary">נסה שוב</button>
+                    </div>
+                `;
+            });
+            
+        // פונקציית טעינת סקריפטים
+        function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
                 script.src = src;
-                script.async = async;
-                script.defer = defer;
+                script.async = true;
                 script.onload = resolve;
-                script.onerror = reject;
+                script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
                 document.body.appendChild(script);
             });
         }
         
-        // טעינת סקריפטים מקומיים
-        document.addEventListener('DOMContentLoaded', () => {
-            // טעינת סקריפטים מקומיים בסדר הנכון
-            loadScript('js/config.js')
-                .then(() => loadScript('js/utils.js'))
-                .then(() => loadScript('js/ui.js'))
-                .then(() => loadScript('js/imageProcessing.js'))
-                .then(() => loadScript('js/detection.js'))
-                .then(() => loadScript('js/exports.js'))
-                .then(() => loadScript('js/app.js'))
-                .catch(error => console.error('שגיאה בטעינת סקריפטים:', error));
-        });
-        
-        // טעינה דחויה של ספריות חיצוניות
-        window.addEventListener('load', () => {
-            // טעינת TensorFlow בעמוד הראשי רק כשצריך
-            document.getElementById('processButton').addEventListener('click', () => {
-                if (window.tf === undefined) {
-                    Promise.all([
-                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0'),
-                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2'),
-                        loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0')
-                    ]).then(() => {
-                        console.log('טענו ספריות TensorFlow בהצלחה');
-                        // מפעיל עיבוד וידאו אם כבר לחצו על הכפתור
-                        if (window.pendingVideoProcessing) {
-                            window.pendingVideoProcessing = false;
-                            window.processVideo();
-                        }
-                    });
+        // אתחול האפליקציה
+        function initApp() {
+            // טעינת מודולים בסיסיים
+            Promise.all([
+                loadScript('js/config.js'),
+                loadScript('js/utils.js')
+            ])
+            .then(() => {
+                console.log('מודולים בסיסיים נטענו');
+                return loadScript('js/ui.js');
+            })
+            .then(() => {
+                console.log('מודול UI נטען');
+                
+                // טעינת מודולים נוספים במקביל
+                return Promise.all([
+                    loadScript('js/imageProcessing.js'),
+                    loadScript('js/detection.js'),
+                    loadScript('js/exports.js')
+                ]);
+            })
+            .then(() => {
+                console.log('כל המודולים נטענו');
+                return loadScript('js/app.js');
+            })
+            .then(() => {
+                console.log('אפליקציה מוכנה');
+                if (window.APP && typeof window.APP.init === 'function') {
+                    // אתחול האפליקציה
+                    window.APP.init();
+                } else {
+                    console.warn('APP.init לא זמין, מפעיל אתחול חלופי');
+                    initDirectLogin();
                 }
+            })
+            .catch(error => {
+                console.error('שגיאה בטעינת סקריפטים:', error);
+                // אפשר אתחול בסיסי גם במקרה של שגיאה
+                initDirectLogin();
+            });
+        }
+        
+        // פונקציית התחברות ישירה במקרה של שגיאה בטעינת המודולים
+        function initDirectLogin() {
+            // אתחול מאזיני אירועים בסיסיים
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.addEventListener('click', handleLogin);
+            }
+            
+            const closeNotificationBtn = document.querySelector('.notification-close');
+            if (closeNotificationBtn) {
+                closeNotificationBtn.addEventListener('click', function() {
+                    document.getElementById('notification').classList.remove('show');
+                });
+            }
+            
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    openTab(this.getAttribute('data-tab'));
+                });
             });
             
-            // טעינת ספריות ייצוא בעת מעבר ללשונית תוצאות
-            document.querySelector('[data-tab="resultTab"]').addEventListener('click', () => {
-                if (window.pdfMake === undefined) {
-                    Promise.all([
-                        loadScript('https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js'),
-                        loadScript('https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js'),
-                        loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js')
-                    ]).then(() => {
-                        console.log('טענו ספריות ייצוא בהצלחה');
-                    });
-                }
+            // בדיקה אם המשתמש כבר מחובר
+            const userName = localStorage.getItem('ai_vision_pro_userName');
+            if (userName) {
+                document.getElementById('userName').value = userName;
+                setTimeout(handleLogin, 500);
+            }
+        }
+        
+        // פתיחת לשונית
+        function openTab(tabName) {
+            // הסרת האקטיביות מכל הטאבים
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // הפעלת הלשונית הנבחרת
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            // עדכון סליידר
+            updateTabSlider();
+        }
+        
+        function updateTabSlider() {
+            const activeTab = document.querySelector('.tab.active');
+            const slider = document.querySelector('.tab-slider');
+            
+            if (activeTab && slider && window.innerWidth > 600) {
+                slider.style.width = `${activeTab.offsetWidth}px`;
+                slider.style.left = `${activeTab.offsetLeft}px`;
+            }
+        }
+        
+        // פונקציית התחברות
+        function handleLogin() {
+            const userName = document.getElementById('userName').value;
+            
+            if (!userName || userName.trim() === '') {
+                document.getElementById('loginStatus').textContent = "נא להזין שם משתמש";
+                return;
+            }
+            
+            document.getElementById('loginButton').disabled = true;
+            document.getElementById('loginStatus').textContent = "מתחבר...";
+            
+            // אחסון השם בלוקל סטורג'
+            localStorage.setItem('ai_vision_pro_userName', userName);
+            
+            // סימולציה של השגת IP
+            const fakeIP = "192.168.1." + Math.floor(Math.random() * 255);
+            localStorage.setItem('ai_vision_pro_userIP', fakeIP);
+            
+            // עדכון ממשק המשתמש
+            document.getElementById('usageCount').textContent = "5";
+            document.getElementById('loginStatus').textContent = '';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('loginSection').style.display = 'none';
+            
+            // אנימציית כניסה
+            document.getElementById('mainApp').animate([
+                { opacity: 0, transform: 'translateY(20px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+            ], {
+                duration: 500,
+                easing: 'ease-out',
+                fill: 'forwards'
             });
-        });
+            
+            // הצג הודעה
+            showNotification(`ברוך הבא, ${userName}!`, 'success');
+        }
+        
+        // הצגת הודעה
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            
+            const notificationIcon = notification.querySelector('.notification-icon');
+            const notificationTitle = notification.querySelector('.notification-title');
+            const notificationMessage = notification.querySelector('.notification-message');
+            
+            // הגדרת סוג ההתראה
+            notificationIcon.className = 'notification-icon';
+            
+            switch(type) {
+                case 'success':
+                    notificationIcon.classList.add('success');
+                    notificationIcon.innerHTML = '<i class="fas fa-check"></i>';
+                    notificationTitle.textContent = 'הצלחה';
+                    break;
+                case 'error':
+                    notificationIcon.classList.add('error');
+                    notificationIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    notificationTitle.textContent = 'שגיאה';
+                    break;
+                case 'info':
+                default:
+                    notificationIcon.classList.add('info');
+                    notificationIcon.innerHTML = '<i class="fas fa-info"></i>';
+                    notificationTitle.textContent = 'עדכון';
+            }
+            
+            notificationMessage.textContent = message;
+            
+            // הצגת ההתראה עם אנימציה
+            notification.classList.add('show');
+            
+            // הסתרה אוטומטית לאחר 5 שניות
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
     </script>
 </body>
 </html>
