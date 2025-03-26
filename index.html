@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Object Detection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-robot pulse"></i>
+            </div>
+            <h2>Loading AI Models</h2>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p>Please wait while we prepare the object detection models...</p>
+            <p class="loading-tip">This may take a moment depending on your connection speed</p>
+        </div>
+    </div>
+
+    <!-- Login Container -->
+    <div id="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-robot"></i>
+                <h1>Video Object Detection</h1>
+                <p>AI-powered object recognition in videos</p>
+            </div>
+            <div class="login-form">
+                <div class="input-group">
+                    <label for="username-input">Enter your name to begin</label>
+                    <input type="text" id="username-input" placeholder="Your name">
+                </div>
+                <button id="login-button" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Get Started
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container (hidden until login) -->
+    <div id="main-container" class="hidden">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>VideoAI</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" id="nav-home" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" id="nav-history"><i class="fas fa-history"></i> History</a></li>
+                <li><a href="#" id="nav-settings"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="username-display">Hello, User</span>
+                <span id="videos-left" class="videos-counter">10 videos left</span>
+            </div>
+        </nav>
+
+        <!-- Home Section -->
+        <section id="home-section" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-camera"></i> Video Analysis</h2>
+                <p>Upload a video to detect objects using AI</p>
+            </div>
+
+            <!-- Upload Box -->
+            <div class="upload-box">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p>Drag & drop your video here or</p>
+                <label for="video-upload" class="upload-btn">Choose File</label>
+                <input type="file" id="video-upload" accept="video/*" hidden>
+                <p class="upload-hint">Supported formats: MP4, WebM, Ogg (max 100MB)</p>
+            </div>
+
+            <!-- Progress Container (hidden initially) -->
+            <div class="progress-container hidden">
+                <h3>Processing Video</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="progress-text">Processing... 0%</p>
+            </div>
+
+            <!-- Results Container (hidden initially) -->
+            <div class="results-container hidden">
+                <!-- Video Player -->
+                <div class="video-player-container">
+                    <div class="video-wrapper">
+                        <video id="video-element" controls></video>
+                        <canvas id="detection-canvas"></canvas>
+                    </div>
+                    <div class="video-controls">
+                        <button id="play-button" class="control-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="pause-button" class="control-btn">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <input type="range" id="video-scrubber" min="0" max="100" value="0">
+                    </div>
+                </div>
+
+                <!-- Objects Results -->
+                <div class="objects-results">
+                    <div class="objects-header">
+                        <h3>Detected Objects</h3>
+                        <div class="objects-actions">
+                            <input type="text" id="filter-objects" placeholder="Filter objects...">
+                            <select id="sort-objects">
+                                <option value="time">Sort by Time</option>
+                                <option value="confidence">Sort by Confidence</option>
+                                <option value="type">Sort by Type</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="objects-container" class="objects-grid"></div>
+                    
+                    <div class="export-options">
+                        <button id="export-presentation" class="btn-secondary">
+                            <i class="fas fa-file-powerpoint"></i> Export to PowerPoint
+                        </button>
+                        <button id="export-pdf" class="btn-secondary">
+                            <i class="fas fa-file-pdf"></i> Export to PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history-section" class="content-section hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Video History</h2>
+                <p>Your previously analyzed videos</p>
+            </div>
+            
+            <div id="history-list" class="history-grid"></div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="content-section hidden">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <p>Configure your detection preferences</p>
+            </div>
+            
+            <div class="settings-container">
+                <div class="settings-group">
+                    <h3>Detection Settings</h3>
+                    
+                    <div class="setting-item">
+                        <label for="detection-threshold">Confidence Threshold: <span id="threshold-value">0.6</span></label>
+                        <input type="range" id="detection-threshold" min="0.1" max="0.9" step="0.05" value="0.6">
+                        <span class="setting-hint">Higher values mean fewer but more accurate detections</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="detection-frequency">Detection Frequency: <span id="frequency-value">5</span></label>
+                        <input type="range" id="detection-frequency" min="1" max="30" step="1" value="5">
+                        <span class="setting-hint">How many frames to analyze per second</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="highlight-color">Highlight Color</label>
+                        <input type="color" id="highlight-color" value="#FF0000">
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>Search Settings</h3>
+                    
+                    <div class="setting-item">
+                        <label for="search-engine">Search Engine</label>
+                        <select id="search-engine">
+                            <option value="google">Google</option>
+                            <option value="bing">Bing</option>
+                            <option value="yandex">Yandex</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="open-new-tab" checked>
+                        <label for="open-new-tab">Open search results in new tab</label>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>Performance Settings</h3>
+                    
+                    <div class="setting-item">
+                        <label for="max-processing-threads">Max Processing Threads: <span id="threads-value">4</span></label>
+                        <input type="range" id="max-processing-threads" min="1" max="8" step="1" value="4">
+                    </div>
+                    
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="use-gpu" checked>
+                        <label for="use-gpu">Use GPU acceleration (if available)</label>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>Appearance</h3>
+                    
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="dark-mode">
+                        <label for="dark-mode">Dark Mode</label>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button id="save-settings" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                    <button id="reset-settings" class="btn-secondary">
+                        <i class="fas fa-undo"></i> Reset to Default
+                    </button>
+                </div>
+            </div>
+        </section>
+        </div>
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-robot"></i>
+                    <span>VideoAI</span>
+                </div>
+                <div class="footer-credits">
+                    <p>&copy; 2025 AI Object Detection System. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#" title="Terms of Service">Terms</a>
+                    <a href="#" title="Privacy Policy">Privacy</a>
+                    <a href="#" title="Contact Us">Contact</a>
+                </div>
+            </div>
+        </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.11.0/pptxgen.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
