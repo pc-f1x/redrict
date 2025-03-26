@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת לזיהוי אובייקטים בסרטונים</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>מערכת לזיהוי אובייקטים בסרטונים</h1>
+            <nav>
+                <ul>
+                    <li class="active" data-tab="home">ראשי</li>
+                    <li data-tab="history">היסטוריה</li>
+                    <li data-tab="settings">הגדרות</li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="tabs">
+            <!-- Home Tab -->
+            <div class="tab-content active" id="home">
+                <div id="login-container" class="login-form">
+                    <h2>ברוכים הבאים</h2>
+                    <div class="form-group">
+                        <label for="username">שם משתמש:</label>
+                        <input type="text" id="username" placeholder="הכנס שם משתמש">
+                    </div>
+                    <button id="login-btn" class="primary-btn">התחל</button>
+                </div>
+
+                <div id="main-container" class="hidden">
+                    <div class="user-info">
+                        <span id="user-greeting">שלום, </span>
+                        <span id="quota-info"></span>
+                    </div>
+                    
+                    <div class="upload-container">
+                        <div class="upload-area" id="drop-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>גרור סרטון לכאן או לחץ לבחירת קובץ</p>
+                            <input type="file" id="file-input" accept="video/*" hidden>
+                        </div>
+                        <button id="analyze-btn" class="primary-btn" disabled>נתח סרטון</button>
+                    </div>
+
+                    <div class="processing-info hidden">
+                        <div class="loader"></div>
+                        <p>מעבד סרטון... <span id="progress">0%</span></p>
+                    </div>
+
+                    <div class="results-container hidden">
+                        <div class="video-player">
+                            <video id="video-player" controls></video>
+                        </div>
+                        
+                        <div class="detection-results">
+                            <h3>אובייקטים שזוהו:</h3>
+                            <div class="controls">
+                                <button id="download-btn" class="secondary-btn">
+                                    <i class="fas fa-download"></i> הורד כמצגת
+                                </button>
+                                <button id="new-analysis-btn" class="secondary-btn">
+                                    <i class="fas fa-plus"></i> ניתוח חדש
+                                </button>
+                            </div>
+                            <div id="objects-container" class="objects-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="history">
+                <h2>היסטוריית ניתוחים</h2>
+                <div id="history-container" class="history-list">
+                    <p class="empty-state">אין ניתוחים קודמים להצגה</p>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settings">
+                <h2>הגדרות</h2>
+                <div class="settings-form">
+                    <div class="setting-group">
+                        <h3>הגדרות זיהוי</h3>
+                        <div class="form-group">
+                            <label for="confidence-threshold">סף ביטחון מינימלי:</label>
+                            <input type="range" id="confidence-threshold" min="0" max="1" step="0.05" value="0.6">
+                            <span id="confidence-value">0.6</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="max-detections">מספר מקסימלי של זיהויים לתמונה:</label>
+                            <input type="number" id="max-detections" min="1" max="100" value="20">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>הגדרות תצוגה</h3>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="show-bounding-boxes" checked>
+                            <label for="show-bounding-boxes">הצג מסגרות זיהוי</label>
+                        </div>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="show-labels" checked>
+                            <label for="show-labels">הצג תוויות</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="box-color">צבע מסגרות:</label>
+                            <input type="color" id="box-color" value="#FF0000">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>מנועי חיפוש</h3>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="search-google" checked>
+                            <label for="search-google">Google</label>
+                        </div>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="search-bing" checked>
+                            <label for="search-bing">Bing</label>
+                        </div>
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="search-yandex" checked>
+                            <label for="search-yandex">Yandex</label>
+                        </div>
+                    </div>
+                    
+                    <button id="save-settings" class="primary-btn">שמור הגדרות</button>
+                    <button id="reset-settings" class="secondary-btn">אפס להגדרות ברירת מחדל</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="object-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2 id="modal-title">אובייקט</h2>
+                <div class="modal-body">
+                    <img id="modal-image" src="" alt="אובייקט שזוהה">
+                    <div class="modal-details">
+                        <p>סוג: <span id="modal-type"></span></p>
+                        <p>ביטחון: <span id="modal-confidence"></span>%</p>
+                        <div class="search-buttons">
+                            <button id="search-google-btn" class="search-btn google">
+                                <i class="fab fa-google"></i> חפש ב-Google
+                            </button>
+                            <button id="search-bing-btn" class="search-btn bing">
+                                <i class="fab fa-microsoft"></i> חפש ב-Bing
+                            </button>
+                            <button id="search-yandex-btn" class="search-btn yandex">
+                                <i class="fas fa-search"></i> חפש ב-Yandex
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="storage.js"></script>
+    <script src="settings.js"></script>
+    <script src="detection.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
