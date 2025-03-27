@@ -1,0 +1,20 @@
+{
+    "admin": {
+        "password": "admin123",
+        "full_name": "מנהל מערכת",
+        "email": "admin@example.com",
+        "permissions": ["search", "export", "admin"]
+    },
+    "user": {
+        "password": "user123",
+        "full_name": "משתמש רגיל", 
+        "email": "user@example.com",
+        "permissions": ["search", "export"]
+    },
+    "guest": {
+        "password": "guest456",
+        "full_name": "משתמש אורח",
+        "email": "guest@example.com",
+        "permissions": ["search"]
+    }
+}
