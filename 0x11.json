@@ -1,20 +1,41 @@
 {
-    "admin": {
-        "password": "user123",
-        "full_name": "user123",
-        "email": "admin@example.com",
-        "permissions": ["search", "export", "admin"]
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "full_name": "מנהל המערכת",
+      "email": "admin@example.com",
+      "access_level": "admin",
+      "active": true
     },
-    "user": {
-        "password": "user123",
-        "full_name": "משתמש רגיל", 
-        "email": "user@example.com",
-        "permissions": ["search", "export"]
+    {
+      "username": "user1",
+      "password": "pass123",
+      "full_name": "משתמש רגיל",
+      "email": "user1@example.com",
+      "access_level": "user",
+      "active": true
     },
-    "guest": {
-        "password": "guest456",
-        "full_name": "משתמש אורח",
-        "email": "guest@example.com",
-        "permissions": ["search"]
+    {
+      "username": "user2",
+      "password": "secret456",
+      "full_name": "משתמש נוסף",
+      "email": "user2@example.com",
+      "access_level": "user",
+      "active": true
+    },
+    {
+      "username": "inactive",
+      "password": "old123",
+      "full_name": "משתמש לא פעיל",
+      "email": "inactive@example.com",
+      "access_level": "user",
+      "active": false
     }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_update": "2025-03-27T10:00:00Z",
+    "description": "קובץ משתמשים למערכת חיפוש מק\"טים"
+  }
 }
