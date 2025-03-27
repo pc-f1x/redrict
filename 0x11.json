@@ -1,7 +1,7 @@
 {
     "admin": {
-        "password": "admin123",
-        "full_name": "מנהל מערכת",
+        "password": "user123",
+        "full_name": "user123",
         "email": "admin@example.com",
         "permissions": ["search", "export", "admin"]
     },
